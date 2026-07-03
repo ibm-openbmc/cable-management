@@ -1,0 +1,9 @@
+[Unit]
+Description=Cable Management Daemon
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/cable-manager
+
+[Install]
+WantedBy=multi-user.target
