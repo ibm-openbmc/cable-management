@@ -1,8 +1,11 @@
 [Unit]
 Description=Cable Management Daemon
+Before=vpd-manager.service
+Wants=vpd-manager.service
 
 [Service]
-Type=simple
+Type=dbus
+BusName=xyz.openbmc_project.Cable.Manager
 ExecStart=/usr/bin/cable-manager
 
 [Install]
