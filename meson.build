@@ -18,7 +18,7 @@ phosphor_logging_dep = dependency('phosphor-logging', required: true)
 sdbusplus_dep = dependency('sdbusplus', required: true)
 boost_dep = dependency('boost', required: true)
 
-cable_manager_sources = ['src/cable_manager_main.cpp']
+cable_manager_sources = ['src/cable_manager_main.cpp', 'src/manager.cpp']
 
 executable(
     'cable-manager',
