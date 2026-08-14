@@ -1,4 +1,5 @@
 #include "constants.hpp"
+#include "manager.hpp"
 
 #include <phosphor-logging/lg2.hpp>
 #include <sdbusplus/asio/connection.hpp>
@@ -11,30 +12,30 @@
 
 int main()
 {
-   try
-   {
-      boost::asio::io_context io_con;
+    try
+    {
+        boost::asio::io_context io_con;
 
-      auto bus = std::make_shared<sdbusplus::asio::connection>(io_con);
+        auto bus = std::make_shared<sdbusplus::asio::connection>(io_con);
 
-      bus->request_name(constants::serviceName);
+        bus->request_name(constants::serviceName);
 
-      sdbusplus::asio::object_server objectServer(bus);
-      objectServer.add_manager(constants::rootPath);
+        sdbusplus::asio::object_server objectServer(bus);
+        objectServer.add_manager(constants::rootPath);
 
-      lg2::info("Cable Manager daemon initialised, D-Bus service "
-              "'{SERVICE}' registered",
-              "SERVICE", constants::serviceName);
+        auto manager = std::make_shared<cable_manager::Manager>(objectServer);
 
-       // TODO: Cable detection and validation logic will be implemented in
-      // future stories
-      io_con.run();
+        lg2::info("Cable Manager daemon initialised, D-Bus service "
+                  "'{SERVICE}' registered",
+                  "SERVICE", constants::serviceName);
 
-    return EXIT_SUCCESS;
-  }
-  catch (const std::exception &e)
-  {
-    lg2::error("Cable Manager failed: {ERROR}", "ERROR", e);
-    return EXIT_FAILURE;
-  }
+        io_con.run();
+
+        return EXIT_SUCCESS;
+    }
+    catch (const std::exception& e)
+    {
+        lg2::error("Cable Manager failed: {ERROR}", "ERROR", e);
+        return EXIT_FAILURE;
+    }
 }
