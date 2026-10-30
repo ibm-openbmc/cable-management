@@ -26,7 +26,15 @@ any system.
 ## 1. Concepts
 
 **Cable type.** A family of cables, such as `CDFP` or `QSFP`. Each cable type is
-a top-level key in the JSON, and its value is a list of cables of that type.
+a top-level key in the JSON, and its value is either a list of cables of that
+type, or a position-keyed object (see **BMC position** below).
+
+**BMC position.** On systems where the BMC has a position (for example `0` or
+`1`), the cables of a type can differ by position. In that case, the cable type
+value is an object keyed by position (`"0"`, `"1"`, ...), and each key holds the
+list of cables for that position. Only the list matching the detected BMC
+position is used. On systems without a BMC position, the cable type value is a
+plain list, and it is used as is.
 
 **Cable instance.** One physical cable, identified by an `id` that is unique
 within its cable type. Each cable is published as one inventory object on D-Bus.
@@ -80,6 +88,25 @@ see what each end of the cable is plugged into.
     { ...next cable of the same type... }
   ],
   "<AnotherCableType>": [ ... ]
+}
+```
+
+If the cables of a type differ by BMC position, the cable type value is an
+object keyed by position instead of a list:
+
+```text
+{
+  "<CableType>": {            <- e.g. "CDFP"
+    "0": [                    <- cables used when BMC position is 0
+      { ...cable... },
+      { ...cable... }
+    ],
+    "1": [                    <- cables used when BMC position is 1
+      { ...cable... },
+      { ...cable... }
+    ]
+  },
+  "<AnotherCableType>": [ ... ] <- position-independent types stay a list
 }
 ```
 
@@ -152,15 +179,90 @@ always that same path with `/uplink` or `/downlink` appended.
 }
 ```
 
+For a position-keyed cable type, put the same cable objects under one key per
+BMC position. Each position holds a complete list of cables for that position:
+
+```json
+{
+  "<CableType>": {
+    "<position>": [
+      {
+        "id": "<id>",
+        "inventory_Path": "<cable path>",
+        "eeprom": "<path to cable EEPROM>",
+        "presence": {
+          "Pin_name": "<GPIO line name>",
+          "value": "<GPIO value meaning present>"
+        },
+        "interfaces": {
+          "xyz.openbmc_project.Inventory.Item": {
+            "PrettyName": "<human-readable cable name>"
+          },
+          "xyz.openbmc_project.Inventory.Item.Cable": {
+            "CableTypeDescription": "<cable type description>"
+          }
+        },
+        "uplink": {
+          "inventory_Path": "<cable path>/uplink",
+          "eeprom": "<path to uplink EEPROM>",
+          "presence": {
+            "gpio": {
+              "Pin_name": "<GPIO line name>",
+              "value": "<GPIO value meaning present>"
+            }
+          },
+          "association": {
+            "itemType": "<D-Bus interface specific to the associated item>",
+            "endpointPath": "<inventory path of the associated item>",
+            "fType": "<forward association name>",
+            "rType": "<reverse association name>"
+          }
+        },
+        "downlink": {
+          "inventory_Path": "<cable path>/downlink",
+          "eeprom": "<path to downlink EEPROM>",
+          "presence": {
+            "gpio": {
+              "Pin_name": "<GPIO line name>",
+              "value": "<GPIO value meaning present>"
+            }
+          },
+          "association": {
+            "itemType": "<D-Bus interface specific to the associated item>",
+            "endpointPath": "<inventory path of the associated item>",
+            "fType": "<forward association name>",
+            "rType": "<reverse association name>"
+          }
+        }
+      }
+    ]
+  }
+}
+```
+
 ---
 
 ## 4. Field reference
 
 ### 4.1 Top level
 
-| Field         | Type  | Required     | Description                                                                                 |
-| ------------- | ----- | ------------ | ------------------------------------------------------------------------------------------- |
-| `<CableType>` | array | At least one | Key is the cable type name (`CDFP`, `QSFP`). Value is a list of cable objects of that type. |
+| Field         | Type            | Required     | Description                                                                                                                                                                                                 |
+| ------------- | --------------- | ------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `<CableType>` | array or object | At least one | Key is the cable type name (`CDFP`, `QSFP`). Value is either a list of cable objects of that type (position-independent), or an object keyed by BMC position (see [4.1.1](#411-position-keyed-cable-type)). |
+
+#### 4.1.1 Position-keyed cable type
+
+Use this form only when the cables of a type differ by BMC position.
+
+| Field        | Type  | Required     | Description                                                                                                                                 |
+| ------------ | ----- | ------------ | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| `<position>` | array | At least one | Key is the BMC position as a string (`"0"`, `"1"`, ...). Value is the complete list of cable objects used when the BMC is at that position. |
+
+- If the detected BMC position has no matching key, cable processing for that
+  type fails with an error. There is no fallback list.
+- If a cable type is position-keyed but the BMC position cannot be determined,
+  cable processing for that type fails with an error.
+- On systems without a BMC position, use the plain list form.
 
 ### 4.2 Cable object
 
@@ -257,9 +359,14 @@ if the associated item is itself published as an inventory object.
    every element in an array (`[ {...}, {...} ]`).
 2. **`id` must be unique** within a cable type. The same `id` may be reused
    across different cable types (`CDFP` id `0` and `QSFP` id `0` are both fine).
+   For a position-keyed cable type, `id` must be unique within each position's
+   list, and the same `id` may appear under different positions.
 3. **Cable paths must be unique.** No two cables may share an `inventory_Path`.
    The preferred form is
-   `/xyz/openbmc_project/inventory/cables/<cableType><id>`.
+   `/xyz/openbmc_project/inventory/cables/<cableType><id>`. For a position-keyed
+   cable type, this applies within each position's list. The same cable path may
+   be reused under different positions, since only one position's list is used
+   at runtime.
 4. **End paths extend the cable path.** The uplink and downlink `inventory_Path`
    must be the cable's `inventory_Path` followed by `/uplink` and `/downlink`.
 5. **Uplink and downlink are always present.** Even if an end has no EEPROM,
@@ -274,6 +381,10 @@ if the associated item is itself published as an inventory object.
    fill them with placeholders.
 9. **GPIO line names** must match the names in the device tree exactly
    (case-sensitive).
+10. **Use position keys only when needed.** Keep a cable type as a plain list
+    unless its cables actually differ by BMC position. When position-keyed,
+    every position the system supports must have its own key, and position keys
+    are strings (`"0"`, not `0`).
 
 ---
 
@@ -307,6 +418,56 @@ associations:
 }
 ```
 
+The same minimal cable for a system where the CDFP cables differ by BMC
+position:
+
+```json
+{
+  "CDFP": {
+    "0": [
+      {
+        "id": "1",
+        "inventory_Path": "/xyz/openbmc_project/inventory/cables/cdfp1",
+        "interfaces": {
+          "xyz.openbmc_project.Inventory.Item": {
+            "PrettyName": "Node 0 CDFP Right cable"
+          },
+          "xyz.openbmc_project.Inventory.Item.Cable": {
+            "CableTypeDescription": "CDFP1"
+          }
+        },
+        "uplink": {
+          "inventory_Path": "/xyz/openbmc_project/inventory/cables/cdfp1/uplink"
+        },
+        "downlink": {
+          "inventory_Path": "/xyz/openbmc_project/inventory/cables/cdfp1/downlink"
+        }
+      }
+    ],
+    "1": [
+      {
+        "id": "1",
+        "inventory_Path": "/xyz/openbmc_project/inventory/cables/cdfp1",
+        "interfaces": {
+          "xyz.openbmc_project.Inventory.Item": {
+            "PrettyName": "Node 1 CDFP Right cable"
+          },
+          "xyz.openbmc_project.Inventory.Item.Cable": {
+            "CableTypeDescription": "CDFP1"
+          }
+        },
+        "uplink": {
+          "inventory_Path": "/xyz/openbmc_project/inventory/cables/cdfp1/uplink"
+        },
+        "downlink": {
+          "inventory_Path": "/xyz/openbmc_project/inventory/cables/cdfp1/downlink"
+        }
+      }
+    ]
+  }
+}
+```
+
 ---
 
 ## 7. Validation checklist
@@ -316,10 +477,15 @@ Before committing the JSON, check that:
 - [ ] The file is valid JSON. Run `jq . <file>.json` or
       `python3 -m json.tool <file>.json`; either prints an error and the line
       number if something is wrong.
+- [ ] Each cable type is a plain list, or, only if its cables differ by BMC
+      position, an object keyed by position with a key for every supported
+      position.
 - [ ] Every cable has `id`, `inventory_Path`, `uplink` and `downlink`.
 - [ ] Every `uplink` and `downlink` has its own `inventory_Path`.
-- [ ] `id`s are unique within each cable type.
-- [ ] Every cable `inventory_Path` is unique across the whole file.
+- [ ] `id`s are unique within each cable type (within each position's list for a
+      position-keyed type).
+- [ ] Every cable `inventory_Path` is unique across the whole file (within each
+      position's list for a position-keyed type).
 - [ ] Every uplink and downlink path is its cable's path followed by `/uplink`
       or `/downlink`.
 - [ ] Cable-level `presence` has `Pin_name` and `value` directly; end-level
