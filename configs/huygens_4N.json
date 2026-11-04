@@ -1,0 +1,192 @@
+{
+    "CDFP": {
+        "0": [
+            {
+                "id": "0",
+                "inventory_Path": "/xyz/openbmc_project/inventory/cables/cdfp0",
+                "presence": {
+                    "Pin_name": "CDFP0_PRES_LEFT_N",
+                    "value": 0
+                },
+                "interfaces": {
+                    "xyz.openbmc_project.Inventory.Item": {
+                        "PrettyName": "Node 0 CDFP_0 cable"
+                    },
+                    "xyz.openbmc_project.Inventory.Item.Cable": {
+                        "CableTypeDescription": "CDFP"
+                    }
+                },
+                "uplink": {
+                    "inventory_Path": "/xyz/openbmc_project/inventory/cables/cdfp0/uplink",
+                    "presence": {
+                        "gpio": {
+                            "Pin_name": "CDFP0_NE_CABLE_PRES_N",
+                            "value": 0
+                        }
+                    },
+                    "association": {
+                        "itemType": "xyz.openbmc_project.Inventory.Item.Connector",
+                        "endpointPath": "/xyz/openbmc_project/inventory/system/chassis1/motherboard/ebmc_card/connector0",
+                        "fType": "upstream_connector",
+                        "rType": "attached_cables"
+                    }
+                },
+                "downlink": {
+                    "inventory_Path": "/xyz/openbmc_project/inventory/cables/cdfp0/downlink",
+                    "presence": {
+                        "gpio": {
+                            "Pin_name": "CDFP0_FE_CABLE_PRES_N",
+                            "value": 0
+                        }
+                    },
+                    "association": {
+                        "itemType": "xyz.openbmc_project.Inventory.Item.Connector",
+                        "endpointPath": "/xyz/openbmc_project/inventory/system/chassis0/motherboard/connector0",
+                        "fType": "downstream_connector",
+                        "rType": "attached_cables"
+                    }
+                }
+            },
+            {
+                "id": "1",
+                "inventory_Path": "/xyz/openbmc_project/inventory/cables/cdfp1",
+                "presence": {
+                    "Pin_name": "CDFP1_PRES_RIGHT_P",
+                    "value": 1
+                },
+                "interfaces": {
+                    "xyz.openbmc_project.Inventory.Item": {
+                        "PrettyName": "Node 0 CDFP_1 cable"
+                    },
+                    "xyz.openbmc_project.Inventory.Item.Cable": {
+                        "CableTypeDescription": "CDFP"
+                    }
+                },
+                "uplink": {
+                    "inventory_Path": "/xyz/openbmc_project/inventory/cables/cdfp1/uplink",
+                    "presence": {
+                        "gpio": {
+                            "Pin_name": "CDFP1_NE_CABLE_PRES_N",
+                            "value": 0
+                        }
+                    },
+                    "association": {
+                        "itemType": "xyz.openbmc_project.Inventory.Item.Connector",
+                        "endpointPath": "/xyz/openbmc_project/inventory/system/chassis1/motherboard/ebmc_card/connector1",
+                        "fType": "upstream_connector",
+                        "rType": "attached_cables"
+                    }
+                },
+                "downlink": {
+                    "inventory_Path": "/xyz/openbmc_project/inventory/cables/cdfp1/downlink",
+                    "presence": {
+                        "gpio": {
+                            "Pin_name": "CDFP1_FE_CABLE_PRES_N",
+                            "value": 0
+                        }
+                    },
+                    "association": {
+                        "itemType": "xyz.openbmc_project.Inventory.Item.Connector",
+                        "endpointPath": "/xyz/openbmc_project/inventory/system/chassis0/motherboard/connector1",
+                        "fType": "downstream_connector",
+                        "rType": "attached_cables"
+                    }
+                }
+            }
+        ],
+        "1": [
+            {
+                "id": "0",
+                "inventory_Path": "/xyz/openbmc_project/inventory/cables/cdfp0",
+                "presence": {
+                    "Pin_name": "CDFP0_PRES_LEFT_N",
+                    "value": 0
+                },
+                "interfaces": {
+                    "xyz.openbmc_project.Inventory.Item": {
+                        "PrettyName": "Node 1 CDFP_0 cable"
+                    },
+                    "xyz.openbmc_project.Inventory.Item.Cable": {
+                        "CableTypeDescription": "CDFP"
+                    }
+                },
+                "uplink": {
+                    "inventory_Path": "/xyz/openbmc_project/inventory/cables/cdfp0/uplink",
+                    "presence": {
+                        "gpio": {
+                            "Pin_name": "CDFP0_NE_CABLE_PRES_N",
+                            "value": 0
+                        }
+                    },
+                    "association": {
+                        "itemType": "xyz.openbmc_project.Inventory.Item.Connector",
+                        "endpointPath": "/xyz/openbmc_project/inventory/system/chassis2/motherboard/ebmc_card/connector0",
+                        "fType": "upstream_connector",
+                        "rType": "attached_cables"
+                    }
+                },
+                "downlink": {
+                    "inventory_Path": "/xyz/openbmc_project/inventory/cables/cdfp0/downlink",
+                    "presence": {
+                        "gpio": {
+                            "Pin_name": "CDFP0_FE_CABLE_PRES_N",
+                            "value": 0
+                        }
+                    },
+                    "association": {
+                        "itemType": "xyz.openbmc_project.Inventory.Item.Connector",
+                        "endpointPath": "/xyz/openbmc_project/inventory/system/chassis0/motherboard/connector12",
+                        "fType": "downstream_connector",
+                        "rType": "attached_cables"
+                    }
+                }
+            },
+            {
+                "id": "1",
+                "inventory_Path": "/xyz/openbmc_project/inventory/cables/cdfp1",
+                "presence": {
+                    "Pin_name": "CDFP1_PRES_RIGHT_P",
+                    "value": 1
+                },
+                "interfaces": {
+                    "xyz.openbmc_project.Inventory.Item": {
+                        "PrettyName": "Node 1 CDFP_1 cable"
+                    },
+                    "xyz.openbmc_project.Inventory.Item.Cable": {
+                        "CableTypeDescription": "CDFP"
+                    }
+                },
+                "uplink": {
+                    "inventory_Path": "/xyz/openbmc_project/inventory/cables/cdfp1/uplink",
+                    "presence": {
+                        "gpio": {
+                            "Pin_name": "CDFP1_NE_CABLE_PRES_N",
+                            "value": 0
+                        }
+                    },
+                    "association": {
+                        "itemType": "xyz.openbmc_project.Inventory.Item.Connector",
+                        "endpointPath": "/xyz/openbmc_project/inventory/system/chassis2/motherboard/ebmc_card/connector1",
+                        "fType": "upstream_connector",
+                        "rType": "attached_cables"
+                    }
+                },
+                "downlink": {
+                    "inventory_Path": "/xyz/openbmc_project/inventory/cables/cdfp1/downlink",
+                    "presence": {
+                        "gpio": {
+                            "Pin_name": "CDFP1_FE_CABLE_PRES_N",
+                            "value": 0
+                        }
+                    },
+                    "association": {
+                        "itemType": "xyz.openbmc_project.Inventory.Item.Connector",
+                        "endpointPath": "/xyz/openbmc_project/inventory/system/chassis0/motherboard/connector13",
+                        "fType": "downstream_connector",
+                        "rType": "attached_cables"
+                    }
+                }
+            }
+        ]
+    }
+}
